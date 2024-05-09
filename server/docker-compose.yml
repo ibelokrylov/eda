@@ -2,7 +2,6 @@ version: '3.9'
 services:
   api:
     container_name: api-gateway
-    network_mode: host
     build:
           context: .
           dockerfile: ./Dockerfile
@@ -11,6 +10,9 @@ services:
           - "5001:5001"
     env_file:
       - .env
+    depends_on:
+      - postgres
+      - redis
   postgres:
     image: postgres:16.1-alpine3.19
     environment:
