@@ -1,0 +1,44 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist && cross-env NODE_ENV=production tsc -p tsconfig.json",
+    "watch:dev": "cross-env NODE_ENV=development nodemon",
+    "watch": "tsc --watch --preserveWatchOutput --pretty",
+    "start": "cross-env NODE_ENV=production node  dist/index.js",
+    "start:dev": "pnpm run --parallel /^watch/",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prisma:generate": "prisma generate && npx prisma db push"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/type-provider-typebox": "^4.0.0",
+    "@mgcrea/fastify-session": "^2.2.1",
+    "@mgcrea/fastify-session-redis-store": "^1.0.0",
+    "@prisma/client": "^5.9.1",
+    "@sinclair/typebox": "^0.32.14",
+    "dotenv": "^16.4.1",
+    "fastify": "^4.26.0",
+    "fastify-plugin": "^4.5.1",
+    "i18n-iso-countries": "^7.10.0",
+    "ioredis": "^5.3.2",
+    "prisma": "^5.9.1",
+    "redis": "^4.6.13"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^5.0.0",
+    "@types/node": "^20.11.16",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  }
+}
