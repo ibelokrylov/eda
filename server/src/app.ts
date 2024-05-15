@@ -37,14 +37,7 @@ app.register(fastifySession, {
 });
 
 app.register(cors, {
-  origin: (origin, cb) => {
-    const hostname = new URL(origin ?? '').hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      cb(null, true);
-      return;
-    }
-    cb(new Error('Not allowed'), false);
-  },
+  origin: ['localhost', '92.118.114.163'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 });
