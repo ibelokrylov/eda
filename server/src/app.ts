@@ -1,12 +1,13 @@
-import fastify from 'fastify';
-import router from './routes';
-import prismaPlugin from './lib/plugins/prisma.plugin';
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import fastifyCookie from '@fastify/cookie';
+import cors from '@fastify/cors';
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import fastifySession from '@mgcrea/fastify-session';
-import { config } from './config';
-import Redis from 'ioredis';
 import RedisStore from '@mgcrea/fastify-session-redis-store';
+import fastify from 'fastify';
+import Redis from 'ioredis';
+import { config } from './config';
+import prismaPlugin from './lib/plugins/prisma.plugin';
+import router from './routes';
 
 export const app = fastify({
   logger: true,
@@ -33,6 +34,19 @@ app.register(fastifySession, {
   cookie: {
     maxAge: config.session.ttl,
   },
+});
+
+app.register(cors, {
+  origin: (origin, cb) => {
+    const hostname = new URL(origin ?? '').hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      cb(null, true);
+      return;
+    }
+    cb(new Error('Not allowed'), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 });
 // app.addHook('onRequest', async (request, reply) => {
 //   request.session.set('')
