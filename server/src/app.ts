@@ -28,7 +28,6 @@ app.register(fastifyCookie, {
   secret: config.session.secret,
   setOptions: {
     path: '/',
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     secure: true,
     httpOnly: true,
     sameSite: 'None',
