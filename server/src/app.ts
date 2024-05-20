@@ -1,4 +1,4 @@
-import fastifyCookie from '@fastify/cookie';
+import fastifyCookie, { FastifyCookieOptions } from '@fastify/cookie';
 import cors from '@fastify/cors';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import fastifySession from '@mgcrea/fastify-session';
@@ -24,7 +24,16 @@ const redisClient = new Redis({
   password: config.redis.password ?? undefined,
 });
 
-app.register(fastifyCookie);
+app.register(fastifyCookie, {
+  secret: config.session.secret,
+  setOptions: {
+    path: '/',
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    secure: true,
+    httpOnly: true,
+    sameSite: 'None',
+  },
+} as FastifyCookieOptions);
 app.register(fastifySession, {
   secret: config.session.secret,
   store: new RedisStore({
