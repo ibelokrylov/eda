@@ -30,9 +30,10 @@ app.register(fastifyCookie, {
     path: '/',
     secure: true,
     httpOnly: true,
-    sameSite: 'None',
+    sameSite: 'none',
   },
 } as FastifyCookieOptions);
+
 app.register(fastifySession, {
   secret: config.session.secret,
   store: new RedisStore({
@@ -42,7 +43,7 @@ app.register(fastifySession, {
   cookie: {
     maxAge: config.session.ttl,
     sameSite: 'none',
-    secure: false,
+    secure: true,
     httpOnly: true,
     path: '/',
   },
