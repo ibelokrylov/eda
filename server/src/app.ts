@@ -41,6 +41,10 @@ app.register(fastifySession, {
   }),
   cookie: {
     maxAge: config.session.ttl,
+    sameSite: 'none',
+    secure: true,
+    httpOnly: true,
+    path: '/',
   },
 });
 
