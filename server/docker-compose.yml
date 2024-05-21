@@ -65,6 +65,7 @@ services:
   redis:
     image: redis:7.2.4-alpine
     container_name: eda-redis
+    restart: always
     command:
       - /bin/sh
       - -c
