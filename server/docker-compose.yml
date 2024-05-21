@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   api:
-    container_name: api-gateway
+    container_name: eda-api-gateway
     build:
           context: .
           dockerfile: ./Dockerfile
@@ -15,6 +15,7 @@ services:
       - redis
   postgres:
     image: postgres:16.1-alpine3.19
+    container_name: eda-postgres
     environment:
       POSTGRES_DB: '${POSTGRES_DB:-fp_db}'
       POSTGRES_USER: '${POSTGRES_USER:-fp_db_admin}'
@@ -63,7 +64,7 @@ services:
 
   redis:
     image: redis:7.2.4-alpine
-    container_name: redis
+    container_name: eda-redis
     command:
       - /bin/sh
       - -c
