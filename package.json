@@ -1,15 +1,16 @@
 {
-  "name": "eda",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start:parser": "node scraper/calories.scraper.js",
-    "start:dev": "cd server && npm run start:dev",
-    "start": "cd server && npm run start",
-    "build": "cd server && npm run build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "eda",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start:parser": "node scraper/calories.scraper.js",
+		"start:dev": "cd server && npm run start:dev",
+		"start": "cd server && npm run start",
+		"build": "cd server && npm run build",
+		"docker:dev": "docker stop dev_eda && docker rm dev_eda && docker rmi dev_eda:latest && docker build -t dev_eda . && docker run -p 5001:5001/tcp -d dev_eda"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
 }
