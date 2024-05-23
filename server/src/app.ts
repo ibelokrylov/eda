@@ -19,7 +19,7 @@ export const app = fastify({
 }).withTypeProvider<TypeBoxTypeProvider>();
 
 const redisClient = new Redis({
-  host: config.redis.url ?? 'localhost',
+  host: config.redis.url,
   port: config.redis.port ?? 6379,
   password: config.redis.password ?? undefined,
   username: config.redis.username ?? undefined,
