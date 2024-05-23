@@ -22,6 +22,7 @@ const redisClient = new Redis({
   host: config.redis.url ?? 'localhost',
   port: config.redis.port ?? 6379,
   password: config.redis.password ?? undefined,
+  username: config.redis.username ?? undefined,
 });
 
 app.register(fastifyCookie, {
