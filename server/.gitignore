@@ -1,7 +1,0 @@
-.idea
-node_modules
-logs
-.git
-dist
-.env
-.env.production
