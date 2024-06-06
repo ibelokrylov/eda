@@ -24,8 +24,9 @@ func InitSession() {
 	day = day * 24
 
 	Session = session.New(session.Config{
-		Expiration: time.Duration(day) * time.Hour,
-		Storage:    GetRedis(),
+		Expiration:     time.Duration(day) * time.Hour,
+		Storage:        GetRedis(),
+		CookieSameSite: fiber.CookieSameSiteNoneMode,
 	})
 }
 
