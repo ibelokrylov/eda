@@ -1,4 +1,3 @@
-/**/node_modules/
-.git/
-.idea
-dist
+.env
+tmp/
+.env.dev.production
