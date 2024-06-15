@@ -23,6 +23,8 @@ func main() {
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 	}))
 
+	println("http://localhost")
+
 	config.Init()
 
 	port := config.GetEnvVariable("APP_PORT")
