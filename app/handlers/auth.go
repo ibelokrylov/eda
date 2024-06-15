@@ -4,6 +4,7 @@ import (
 	"safechron/api/app/config"
 	"safechron/api/app/entities"
 	"safechron/api/app/helpers"
+	"safechron/api/app/service"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,7 @@ func Authenticated(c *fiber.Ctx) error {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), validationErr.Error()))
 	}
 
-	find_user, find_err := GetUserByUsername(user.Username)
+	find_user, find_err := service.GetUserByUsername(user.Username)
 	if find_err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), find_err.Error()))
 	}

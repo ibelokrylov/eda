@@ -72,11 +72,10 @@ func UserLogout(c *fiber.Ctx) error {
 	return c.JSON(config.BaseResult(config.GetStatus("OK"), "User logged out"))
 }
 
-func GetUserByUsername(username string) (entities.User, error) {
-	var user entities.User
-	u := config.Db.Unscoped().First(&user, "username = ?", username)
-	if u.Error != nil {
-		return user, u.Error
+func GetCodeRegistration(c *fiber.Ctx) error {
+	user, err := config.ParseUserSession(c)
+	if err != nil {
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
 	}
-	return user, nil
+	return service.GetUserRegistrationNewOrOldCode(user.ID)
 }

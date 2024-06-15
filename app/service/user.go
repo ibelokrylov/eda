@@ -12,7 +12,7 @@ import (
 func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	find_user, _ := GetUserByUsername(user.Username)
 	if find_user.ID != uuid.Nil {
-		return nil, errors.New("User not created")
+		return nil, errors.New("user not created")
 	}
 
 	new_user := new(entities.User)
@@ -26,6 +26,14 @@ func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	u := config.Db.Create(&new_user)
 	if u.Error != nil {
 		return nil, u.Error
+	}
+	code, err := GenerateCode(new_user.ID, entities.CODE_REGISTRATION)
+	if err != nil {
+		return new_user, err
+	}
+	err = SendEmailCodeConfirmRegistration(new_user.Username, code.Code)
+	if err != nil {
+		return new_user, err
 	}
 	return new_user, nil
 }
@@ -54,4 +62,14 @@ func UpdateUser(user entities.User) (entities.User, error) {
 		return entities.User{}, u.Error
 	}
 	return user, nil
+}
+
+func GetUserRegistrationNewOrOldCode(user_id uuid.UUID) error {
+	code, err := GetUserCodeByType(user_id, entities.CODE_REGISTRATION)
+	if err != nil {
+		return err
+	}
+	user, _ := GetUserById(user_id)
+	SendEmailCodeConfirmRegistration(user.Username, code.Code)
+	return nil
 }
