@@ -7,6 +7,7 @@ import (
 	"safechron/api/app/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 )
 
@@ -14,6 +15,11 @@ const Version = "1.0.0"
 
 func main() {
 	app := fiber.New()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "https://dev-eda.ibell.online, http://localhost:3000",
+		AllowCredentials: true,
+	}))
 
 	config.Init()
 
@@ -40,6 +46,9 @@ func main() {
 	userSurvey := user.Group("/survey", middleware.IsAuthRequired)
 	userSurvey.Post("/", handlers.CreateSurvey)
 	userSurvey.Get("/", handlers.GetSurveyByUserId)
+
+	emailUser := user.Group("/email", middleware.IsAuthRequired)
+	emailUser.Get("/registration_code", handlers.GetCodeRegistration)
 
 	log.Fatal(app.Listen(port))
 }
