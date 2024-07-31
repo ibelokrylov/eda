@@ -1,8 +1,8 @@
 package config
 
 import (
+	"eda/app/entities"
 	"encoding/gob"
-	"safechron/api/app/entities"
 
 	"github.com/google/uuid"
 )

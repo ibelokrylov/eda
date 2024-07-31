@@ -1,4 +1,4 @@
-module safechron/api
+module eda
 
 go 1.22.3
 

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"safechron/api/app/config"
-	"safechron/api/app/entities"
-	"safechron/api/app/helpers"
+	"eda/app/config"
+	"eda/app/entities"
+	"eda/app/helpers"
 	"strconv"
 	"time"
 

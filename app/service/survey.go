@@ -1,9 +1,9 @@
 package service
 
 import (
+	"eda/app/config"
+	"eda/app/entities"
 	"errors"
-	"safechron/api/app/config"
-	"safechron/api/app/entities"
 
 	"github.com/google/uuid"
 )

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"safechron/api/app/entities"
+	"eda/app/entities"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

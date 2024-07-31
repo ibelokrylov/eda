@@ -1,10 +1,10 @@
 package service
 
 import (
+	"eda/app/config"
+	"eda/app/entities"
+	"eda/app/helpers"
 	"errors"
-	"safechron/api/app/config"
-	"safechron/api/app/entities"
-	"safechron/api/app/helpers"
 
 	"github.com/google/uuid"
 )
@@ -27,14 +27,14 @@ func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	if u.Error != nil {
 		return nil, u.Error
 	}
-	code, err := GenerateCode(new_user.ID, entities.CODE_REGISTRATION)
-	if err != nil {
-		return new_user, err
-	}
-	err = SendEmailCodeConfirmRegistration(new_user.Username, code.Code)
-	if err != nil {
-		return new_user, err
-	}
+	// code, err := GenerateCode(new_user.ID, entities.CODE_REGISTRATION)
+	// if err != nil {
+	// 	return new_user, err
+	// }
+	// err = SendEmailCodeConfirmRegistration(new_user.Username, code.Code)
+	// if err != nil {
+	// 	return new_user, err
+	// }
 	return new_user, nil
 }
 

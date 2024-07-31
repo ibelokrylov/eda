@@ -1,10 +1,10 @@
 package main
 
 import (
+	"eda/app/config"
+	"eda/app/handlers"
+	"eda/app/middleware"
 	"log"
-	"safechron/api/app/config"
-	"safechron/api/app/handlers"
-	"safechron/api/app/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"

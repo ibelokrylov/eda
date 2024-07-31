@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"safechron/api/app/config"
-	"safechron/api/app/service"
+	"eda/app/config"
+	"eda/app/service"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"

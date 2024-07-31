@@ -1,9 +1,9 @@
 package service
 
 import (
+	"eda/app/config"
 	"net/smtp"
 	"os"
-	"safechron/api/app/config"
 
 	"github.com/aymerick/raymond"
 )

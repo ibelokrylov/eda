@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"safechron/api/app/config"
-	"safechron/api/app/entities"
-	"safechron/api/app/service"
+	"eda/app/config"
+	"eda/app/entities"
+	"eda/app/service"
 
 	"github.com/gofiber/fiber/v2"
 )
