@@ -12,15 +12,15 @@ func CreateSurvey(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	body_survey := new(entities.SurveyData)
 	if err := c.BodyParser(body_survey); err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	survey, err := service.CreateSurvey(user.ID, *body_survey)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 
 	return c.JSON(config.BaseResult(config.GetStatus("OK"), survey))
@@ -29,11 +29,11 @@ func CreateSurvey(c *fiber.Ctx) error {
 func GetSurveyByUserId(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	survey, err := service.GetSurveyByUserId(user.ID)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	return c.JSON(config.BaseResult(config.GetStatus("OK"), survey))
 }

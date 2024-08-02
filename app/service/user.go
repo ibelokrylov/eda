@@ -10,23 +10,30 @@ import (
 )
 
 func CreateUser(user entities.CreateUser) (*entities.User, error) {
+	// Check if a user with the given username already exists
 	find_user, _ := GetUserByUsername(user.Username)
 	if find_user.ID != uuid.Nil {
-		return nil, errors.New("user not created")
+		return nil, errors.New("user not created: username already exists")
 	}
 
+	// Create a new user instance
 	new_user := new(entities.User)
 	new_user.Username = user.Username
 	new_user.IsActive = false
 	new_user.FirstName = user.FirstName
 	new_user.LastName = user.LastName
+
+	// Hash the user's password
 	hash_password, _ := helpers.HashPassword(user.Password)
 	new_user.Password = hash_password
 
+	// Save the new user to the database
 	u := config.Db.Create(&new_user)
 	if u.Error != nil {
 		return nil, u.Error
 	}
+
+	// Uncomment and implement the following lines if email confirmation is required
 	// code, err := GenerateCode(new_user.ID, entities.CODE_REGISTRATION)
 	// if err != nil {
 	// 	return new_user, err
@@ -35,6 +42,7 @@ func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	// if err != nil {
 	// 	return new_user, err
 	// }
+
 	return new_user, nil
 }
 

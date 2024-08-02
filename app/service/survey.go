@@ -3,7 +3,7 @@ package service
 import (
 	"eda/app/config"
 	"eda/app/entities"
-	"errors"
+	"eda/app/helpers"
 
 	"github.com/google/uuid"
 )
@@ -12,12 +12,19 @@ func CreateSurvey(userUUID uuid.UUID, survey entities.SurveyData) (entities.User
 	find_survey, _ := GetSurveyByUserId(userUUID)
 
 	if find_survey.ID != uuid.Nil {
-		return entities.UserSurvey{}, errors.New("user already have a survey")
+		if err := helpers.ValidateStruct(&survey); err != nil {
+			return entities.UserSurvey{}, err
+		}
+		find_survey.Data = survey
+		if err := config.Db.Save(&find_survey).Error; err != nil {
+			return entities.UserSurvey{}, err
+		}
+		return find_survey, nil
 	}
 
 	new_survey := new(entities.UserSurvey)
 
-	new_survey.UserId = userUUID
+	new_survey.UserID = userUUID
 	new_survey.Data = survey
 
 	er := config.Db.Create(&new_survey)
@@ -31,7 +38,7 @@ func CreateSurvey(userUUID uuid.UUID, survey entities.SurveyData) (entities.User
 
 func GetSurveyByUserId(userUUID uuid.UUID) (entities.UserSurvey, error) {
 	var survey entities.UserSurvey
-	u := config.Db.Unscoped().First(&survey, "user_id = ?", userUUID)
+	u := config.Db.First(&survey, "user_id = ?", userUUID)
 	if u.Error != nil {
 		return entities.UserSurvey{}, u.Error
 	}

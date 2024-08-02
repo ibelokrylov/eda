@@ -9,18 +9,19 @@ import (
 
 type User struct {
 	ID            uuid.UUID      `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
-	CreatedAt     time.Time      `json:"created_at" gorm:"autoCreateTime:true"`
-	UpdatedAt     time.Time      `json:"updated_at" gorm:"autoUpdateTime:true"`
+	CreatedAt     time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt     time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 	Username      string         `json:"username" validate:"required,email"`
 	Email_confirm bool           `json:"email_confirm" gorm:"default:false"`
 	Password      string         `json:"-" validate:"required,min=8"`
 	IsActive      bool           `json:"is_active" gorm:"default:true"`
-	FirstName     string         `json:"firstName" validate:"required"`
-	LastName      string         `json:"lastName" validate:"required"`
-	Survey        UserSurvey     `json:"-" gorm:"foreignKey:UserId"`
+	FirstName     string         `json:"first_name" validate:"required"`
+	LastName      string         `json:"last_name" validate:"required"`
+	Survey        UserSurvey     `json:"-" gorm:"foreignKey:UserID"`
 }
 
+// CreateUser represents the structure for creating a new user.
 type CreateUser struct {
 	Username        string `json:"username" validate:"required,min=3"`
 	Password        string `json:"password" validate:"required,min=8"`

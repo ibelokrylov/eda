@@ -13,16 +13,16 @@ import (
 func CreateUser(c *fiber.Ctx) error {
 	user := new(entities.CreateUser)
 	if err := c.BodyParser(user); err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 
 	if validationErr := helpers.ValidateStruct(user); validationErr != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), validationErr.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, validationErr.Error()))
 	}
 
 	new_user, err := service.CreateUser(*user)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	createSessionErr := config.SetSessionKey(c, "user", config.UserSession{ID: new_user.ID})
 	if createSessionErr != nil {
