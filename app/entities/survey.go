@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type UserSurvey struct {
@@ -11,6 +12,7 @@ type UserSurvey struct {
 	UserID    uuid.UUID  `json:"user_id" validate:"required,uuid4"`
 	CreatedAt time.Time  `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt time.Time  `json:"deleted_at" gorm:"index"`
 	Data      SurveyData `json:"data" validate:"required" gorm:"json"`
 }
 
@@ -42,4 +44,9 @@ type SurveyData struct {
 	Birthday time.Time `json:"birthday" validate:"required"`     // Use time.Time for birthday
 	Activity Activity  `json:"activity" validate:"required,oneof=SEDENTARY_LIFESTYLE MODERATE_LIFESTYLE ACTIVE_LIFESTYLE HIGHLY_ACTIVE_LIFESTYLE"`
 	Weight   int       `json:"weight" validate:"required,min=0"` // Ensure weight is a positive number
+}
+
+func (s *UserSurvey) UserSurveyDelete(tx *gorm.DB) error {
+	s.DeletedAt = time.Now()
+	return tx.Save(s).Error
 }

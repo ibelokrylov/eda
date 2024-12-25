@@ -21,6 +21,6 @@ func Connect() error {
 		panic(err)
 	}
 
-	Db.AutoMigrate(&entities.User{}, &entities.Code{}, &entities.UserSurvey{})
+	Db.AutoMigrate(&entities.User{}, &entities.Code{}, &entities.UserSurvey{}, &entities.ProductCategory{}, &entities.Food{}, &entities.Product{})
 	return nil
 }

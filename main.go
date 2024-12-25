@@ -23,9 +23,11 @@ func main() {
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 	}))
 
-	println("http://localhost")
-
 	config.Init()
+
+	app.Use(func(c *fiber.Ctx) error {
+		return middleware.LoggerMiddleware(c, config.Logger)
+	})
 
 	port := config.GetEnvVariable("APP_PORT")
 	// TODO: add clear cookie else invalid cookie

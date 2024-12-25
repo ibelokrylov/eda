@@ -19,9 +19,9 @@ type User struct {
 	FirstName     string         `json:"first_name" validate:"required"`
 	LastName      string         `json:"last_name" validate:"required"`
 	Survey        UserSurvey     `json:"-" gorm:"foreignKey:UserID"`
+	Meal          Meal           `json:"-" gorm:"foreignKey:UserID"`
 }
 
-// CreateUser represents the structure for creating a new user.
 type CreateUser struct {
 	Username        string `json:"username" validate:"required,min=3"`
 	Password        string `json:"password" validate:"required,min=8"`
@@ -30,17 +30,7 @@ type CreateUser struct {
 	LastName        string `json:"lastName" validate:"required"`
 }
 
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	u.CreatedAt = time.Now()
-	return
-}
-
-func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
-	u.UpdatedAt = time.Now()
-	return
-}
-
-func (u *User) BeforeDelete(tx *gorm.DB) (err error) {
+func (u *User) UserDelete(tx *gorm.DB) (err error) {
 	var zeroTime time.Time
 	if u.DeletedAt.Time == zeroTime {
 		u.DeletedAt.Time = time.Now()
