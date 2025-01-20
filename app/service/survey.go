@@ -4,14 +4,12 @@ import (
 	"eda/app/config"
 	"eda/app/entities"
 	"eda/app/helpers"
-
-	"github.com/google/uuid"
 )
 
-func CreateSurvey(userUUID uuid.UUID, survey entities.SurveyData) (entities.UserSurvey, error) {
-	find_survey, _ := GetSurveyByUserId(userUUID)
+func CreateSurvey(userID int64, survey entities.SurveyData) (entities.UserSurvey, error) {
+	find_survey, _ := GetSurveyByUserId(userID)
 
-	if find_survey.ID != uuid.Nil {
+	if find_survey.ID != 0 {
 		if err := helpers.ValidateStruct(&survey); err != nil {
 			return entities.UserSurvey{}, err
 		}
@@ -24,7 +22,7 @@ func CreateSurvey(userUUID uuid.UUID, survey entities.SurveyData) (entities.User
 
 	new_survey := new(entities.UserSurvey)
 
-	new_survey.UserID = userUUID
+	new_survey.UserID = userID
 	new_survey.Data = survey
 
 	er := config.Db.Create(&new_survey)
@@ -36,9 +34,9 @@ func CreateSurvey(userUUID uuid.UUID, survey entities.SurveyData) (entities.User
 	return *new_survey, nil
 }
 
-func GetSurveyByUserId(userUUID uuid.UUID) (entities.UserSurvey, error) {
+func GetSurveyByUserId(userID int64) (entities.UserSurvey, error) {
 	var survey entities.UserSurvey
-	u := config.Db.First(&survey, "user_id = ?", userUUID)
+	u := config.Db.First(&survey, "user_id = ?", userID)
 	if u.Error != nil {
 		return entities.UserSurvey{}, u.Error
 	}

@@ -7,13 +7,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/google/uuid"
 )
 
 var Session *session.Store
 
 type UserSession struct {
-	ID uuid.UUID `json:"id" validate:"required,uuid4"`
+	ID int64 `json:"id" validate:"required"`
 }
 
 func InitSession() {

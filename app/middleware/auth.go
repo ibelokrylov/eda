@@ -5,7 +5,6 @@ import (
 	"eda/app/service"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func IsAuthRequired(c *fiber.Ctx) error {
@@ -14,11 +13,10 @@ func IsAuthRequired(c *fiber.Ctx) error {
 		return c.JSON(config.BaseResult(config.GetStatus("NOT_AUTH"), "Unauthorized"))
 	}
 
-	user_id, parse_err_uuid := uuid.Parse(user.ID.String())
-	if parse_err_uuid != nil {
+	if user.ID == 0 {
 		return c.JSON(config.BaseResult(config.GetStatus("NOT_AUTH"), "Unauthorized"))
 	}
-	_, err := service.GetUserById(user_id)
+	_, err := service.GetUserById(user.ID)
 	if err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("NOT_AUTH"), "Unauthorized"))
 	}

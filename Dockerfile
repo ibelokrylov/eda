@@ -1,9 +1,10 @@
+
 # Этап 1: Сборка исполняемого файла
 # Используем базовый образ Golang для сборки приложения
 FROM golang:1.22.3-alpine as builder
 
-# Установка Git для получения зависимостей
-RUN apk add --no-cache git
+# Установка необходимых пакетов: Git и Hyperscan
+RUN apk add --no-cache git cmake g++ libstdc++ libhyperscan-dev
 
 # Создаем рабочую директорию для нашего приложения
 WORKDIR /app
@@ -24,8 +25,8 @@ RUN CGO_ENABLED=0 go build -ldflags='-w -s' -o /main .
 # Используем небольшой образ Alpine Linux для запуска приложения
 FROM alpine:3.16
 
-# Установка CA-сертификатов для HTTPS запросов
-RUN apk add --no-cache ca-certificates
+# Установка CA-сертификатов и Hyperscan runtime library
+RUN apk add --no-cache ca-certificates libstdc++ libhyperscan
 
 # Создаем непривилегированного пользователя для запуска приложения (защита)
 RUN adduser -D user
@@ -34,6 +35,7 @@ USER user
 # Копирование исполняемого файла из предыдущего этапа
 COPY --from=builder /main /main
 COPY .env .env
+
 # Объявление порта, на котором будет работать приложение
 EXPOSE 5001
 

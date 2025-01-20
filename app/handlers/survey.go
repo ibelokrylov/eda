@@ -10,7 +10,6 @@ import (
 
 func CreateSurvey(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
-
 	if err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}

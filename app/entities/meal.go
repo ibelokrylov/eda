@@ -3,21 +3,29 @@ package entities
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Meal struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
-	Day       time.Time `json:"day" validate:"required" gorm:"default:CURRENT_TIMESTAMP"`
-	UserID    uuid.UUID `json:"user_id" validate:"required,uuid4"`
-	Product   []Product `json:"data_product" gorm:"json"`
-	Food      []Food    `json:"data_food" gorm:"json"`
-	MealType  MealType  `json:"meal_type" validate:"required,eq=breakfast|eq=lunch|eq=dinner|eq=snack"`
-	Type      string    `json:"type" validate:"required,eq=product|eq=food"`
+	ID        int64          `json:"id" gorm:"primaryKey"`
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index,default:NULL"`
+	Day       time.Time      `json:"day" validate:"required" gorm:"default:CURRENT_TIMESTAMP;index"`
+	UserID    int64          `json:"user_id" validate:"required"`
+	MealFoods []MealFood     `json:"meal_foods" gorm:"json"`
+	MealType  MealType       `json:"meal_type" validate:"required,eq=breakfast|eq=lunch|eq=dinner|eq=snack" gorm:"index"`
+	Weight    float64        `json:"weight"`
+	Info      ProductStat    `json:"info" gorm:"json"`
 }
 
+type MealFood struct {
+	Type   string      `json:"type" validate:"required,eq=product|eq=food"`
+	Id     *int64      `json:"id"`
+	Weight float64     `json:"weight" validate:"required"`
+	Info   ProductStat `json:"info" gorm:"json"`
+	Name   *string     `json:"name"`
+}
 type MealType string
 
 const (
@@ -28,10 +36,7 @@ const (
 )
 
 type CreateMeal struct {
-	Day      time.Time `json:"day" validate:"required"`
-	UserId   uuid.UUID `json:"user_id" validate:"required,uuid4"`
-	Product  []Product `json:"data_product" gorm:"json"`
-	Food     []Food    `json:"data_food" gorm:"json"`
-	MealType MealType  `json:"meal_type" validate:"required,eq=breakfast|eq=lunch|eq=dinner|eq=snack"`
-	Type     string    `json:"type" validate:"required,eq=product|eq=food"`
+	Day      string     `json:"day" validate:"required"`
+	Food     []MealFood `json:"food"`
+	MealType MealType   `json:"meal_type" validate:"required,eq=breakfast|eq=lunch|eq=dinner|eq=snack"`
 }

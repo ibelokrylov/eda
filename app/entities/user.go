@@ -3,15 +3,14 @@ package entities
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID            uuid.UUID      `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	ID            int64          `json:"id" gorm:"primaryKey"`
 	CreatedAt     time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt     gorm.DeletedAt `json:"deleted_at" gorm:"index"`
+	DeletedAt     gorm.DeletedAt `json:"deleted_at" gorm:"index,default:NULL"`
 	Username      string         `json:"username" validate:"required,email"`
 	Email_confirm bool           `json:"email_confirm" gorm:"default:false"`
 	Password      string         `json:"-" validate:"required,min=8"`
@@ -20,6 +19,7 @@ type User struct {
 	LastName      string         `json:"last_name" validate:"required"`
 	Survey        UserSurvey     `json:"-" gorm:"foreignKey:UserID"`
 	Meal          Meal           `json:"-" gorm:"foreignKey:UserID"`
+	BzuNorm       []UserBzuNorm  `json:"-" gorm:"foreignKey:UserID"`
 }
 
 type CreateUser struct {
@@ -30,10 +30,25 @@ type CreateUser struct {
 	LastName        string `json:"lastName" validate:"required"`
 }
 
-func (u *User) UserDelete(tx *gorm.DB) (err error) {
-	var zeroTime time.Time
-	if u.DeletedAt.Time == zeroTime {
-		u.DeletedAt.Time = time.Now()
-	}
-	return
+type UserBzuNorm struct {
+	ID        int64     `json:"id" gorm:"primaryKey"`
+	UserID    int64     `json:"user_id" gorm:"index"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	Max       float64   `json:"max"`
+	Day       time.Time `json:"day" validate:"required" gorm:"default:CURRENT_TIMESTAMP;index"`
+}
+
+type UserBzuNormResponse struct {
+	ID        int64     `json:"id" gorm:"primaryKey"`
+	UserID    int64     `json:"user_id" gorm:"index"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	Max       float64   `json:"max"`
+	Day       time.Time `json:"day" validate:"required" gorm:"default:CURRENT_TIMESTAMP;index"`
+	Current   float64   `json:"current"`
+}
+
+type CreateUserBzuNorm struct {
+	Day string `json:"day" validate:"required"`
 }

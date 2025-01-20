@@ -2,8 +2,6 @@ package entities
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type CodeType string
@@ -16,9 +14,9 @@ const (
 )
 
 type Code struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	ID        int64     `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime:true"`
-	UserId    uuid.UUID `json:"user_id" validate:"required,uuid4" gorm:"not null" sql:"type:uuid"`
+	UserId    int64     `json:"user_id" validate:"required" gorm:"not null"`
 	Type      CodeType  `json:"type" validate:"required,eq=reset_password|eq=change_email|eq=registration|eq=confirm_auth"`
 	Code      string    `json:"code" validate:"required,min=6,max=6"`
 	IsUsed    bool      `json:"is_used" gorm:"default:false"`

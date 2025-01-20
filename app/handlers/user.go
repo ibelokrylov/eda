@@ -5,9 +5,9 @@ import (
 	"eda/app/entities"
 	"eda/app/helpers"
 	"eda/app/service"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func CreateUser(c *fiber.Ctx) error {
@@ -16,8 +16,8 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 
-	if validationErr := helpers.ValidateStruct(user); validationErr != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, validationErr.Error()))
+	if err := helpers.ValidateStruct(user); err != nil {
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 
 	new_user, err := service.CreateUser(*user)
@@ -26,7 +26,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 	createSessionErr := config.SetSessionKey(c, "user", config.UserSession{ID: new_user.ID})
 	if createSessionErr != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), createSessionErr.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, createSessionErr.Error()))
 	}
 
 	// TODO: Send email to user code
@@ -46,7 +46,7 @@ type GetUserOptions struct {
 	IncludeDeleted bool
 }
 
-func GetUserById(user_id uuid.UUID) (entities.User, error) {
+func GetUserById(user_id int64) (entities.User, error) {
 	u, err := service.GetUserById(user_id)
 	if err != nil {
 		return u, err
@@ -58,24 +58,42 @@ func GetUserById(user_id uuid.UUID) (entities.User, error) {
 func GetUserProfile(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	user_data, err := GetUserById(user.ID)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	return c.JSON(config.BaseResult(config.GetStatus("OK"), user_data))
 }
 
 func UserLogout(c *fiber.Ctx) error {
 	config.DeleteSessionKey(c, "user")
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), "User logged out"))
+	return c.JSON(config.BaseResult(config.GetStatus("OK"), nil, "User logged out"))
 }
 
 func GetCodeRegistration(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err.Error()))
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
 	return service.GetUserRegistrationNewOrOldCode(user.ID)
+}
+
+func GetUserBzu(c *fiber.Ctx) error {
+	user, err := config.ParseUserSession(c)
+	if err != nil {
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+	}
+
+	date, err := time.Parse("2006-01-02", c.Query("date"))
+	if err != nil {
+		// date current day 00:00:00
+		date = time.Now().Truncate(24 * time.Hour)
+	}
+	bzu, err := service.GenerateOrReadBzu(user.ID, date)
+	if err != nil {
+		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+	}
+	return c.JSON(config.BaseResult(config.GetStatus("OK"), bzu))
 }

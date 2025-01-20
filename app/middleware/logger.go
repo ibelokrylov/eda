@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"eda/app/config"
+	"eda/app/helpers"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,12 +14,12 @@ func LoggerMiddleware(c *fiber.Ctx, logger *logrus.Logger) error {
 	userSession, _ := config.ParseUserSession(c)
 	sessionID := "not_authenticated"
 
-	if userSession.ID != uuid.Nil {
-		sessionID = userSession.ID.String()
+	if userSession.ID != 0 {
+		sessionID = strconv.FormatInt(userSession.ID, 10)
 	}
 
 	if traceID == "" {
-		newTraceID := uuid.New().String()
+		newTraceID := strconv.FormatInt(helpers.GenerateRandomInt64(), 10)
 		c.Cookie(&fiber.Cookie{
 			Name:  "X-Request-Id",
 			Value: newTraceID,
