@@ -137,6 +137,9 @@ func CalculatedUserBzu(id int64) (float64, error) {
 	var calc float64 = 0
 	age := CalculateUserAgeByBirthdayDate(u.Survey.Data.Birthday)
 
+	if u.Survey.Data.Gender == "" {
+		return 0, errors.New("CalculatedUserBzu@Survey-required")
+	}
 	if u.Survey.Data.Gender == "MALE" {
 		calc = 66.5 + (13.75 * float64(u.Survey.Data.Weight)) + (5.003 * float64(u.Survey.Data.Growth)) - (6.755 * float64(age))
 	} else {
@@ -159,6 +162,7 @@ func CalculatedUserBzu(id int64) (float64, error) {
 		calc = calc - 400
 	case "GAIN_WEIGHT":
 		calc = calc + 400
+	default:
 	}
 
 	return calc, nil
