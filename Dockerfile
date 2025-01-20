@@ -1,7 +1,7 @@
 
 # Этап 1: Сборка исполняемого файла
 # Используем базовый образ Golang для сборки приложения
-FROM golang:1.22.3-alpine as builder
+FROM golang:1.23.4-alpine as builder
 
 # Установка необходимых пакетов: Git и Hyperscan
 RUN apk add --no-cache git cmake g++ libstdc++ libhyperscan-dev
