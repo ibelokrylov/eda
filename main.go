@@ -19,13 +19,11 @@ func main() {
 
 	app := fiber.New()
 
-	fu := config.GetEnvVariable("FRONT_URL")
-
 	app.Use(cors.New(cors.Config{
 		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
 		AllowCredentials: true,
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-		AllowOrigins:     fu,
+		AllowOrigins:     "http://localhost:3000",
 		// AllowOriginsFunc: func(origin string) bool {
 		// 	fmt.Println(origin)
 		// 	if strings.HasPrefix(origin, "http://localhost:") || origin == "http://localhost" {
