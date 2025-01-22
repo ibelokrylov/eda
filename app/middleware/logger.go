@@ -21,8 +21,11 @@ func LoggerMiddleware(c *fiber.Ctx, logger *logrus.Logger) error {
 	if traceID == "" {
 		newTraceID := strconv.FormatInt(helpers.GenerateRandomInt64(), 10)
 		c.Cookie(&fiber.Cookie{
-			Name:  "X-Request-Id",
-			Value: newTraceID,
+			Name:     "X-Request-Id",
+			Value:    newTraceID,
+			Path:     "/",
+			SameSite: "None",
+			Secure:   true,
 		})
 		traceID = newTraceID
 	}
