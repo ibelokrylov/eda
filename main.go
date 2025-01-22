@@ -5,6 +5,7 @@ import (
 	"eda/app/handlers"
 	"eda/app/middleware"
 	"eda/app/service"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -26,6 +27,7 @@ func main() {
 		AllowCredentials: true,
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 		AllowOriginsFunc: func(origin string) bool {
+			fmt.Println(origin)
 			if strings.HasPrefix(origin, "http://localhost:") || origin == "http://localhost" {
 				return true
 			}
