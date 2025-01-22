@@ -6,6 +6,7 @@ import (
 	"eda/app/routes"
 	"eda/app/service"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,21 +24,19 @@ func main() {
 		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
 		AllowCredentials: true,
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-		AllowOrigins:     "http://localhost:3000",
-		// AllowOriginsFunc: func(origin string) bool {
-		// 	fmt.Println(origin)
-		// 	if strings.HasPrefix(origin, "http://localhost:") || origin == "http://localhost" {
-		// 		return true
-		// 	}
+		AllowOriginsFunc: func(origin string) bool {
+			if strings.HasPrefix(origin, "http://localhost:") || origin == "http://localhost" {
+				return true
+			}
 
-		// 	allowedOrigins := []string{"https://example.com", "https://another.example.com"}
-		// 	for _, o := range allowedOrigins {
-		// 		if o == origin {
-		// 			return true
-		// 		}
-		// 	}
-		// 	return false
-		// },
+			allowedOrigins := []string{"https://example.com", "https://another.example.com"}
+			for _, o := range allowedOrigins {
+				if o == origin {
+					return true
+				}
+			}
+			return false
+		},
 	}))
 	app.Use(func(c *fiber.Ctx) error {
 		return middleware.LoggerMiddleware(c, config.Logger)
