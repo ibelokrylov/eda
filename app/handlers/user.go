@@ -69,7 +69,7 @@ func GetUserProfile(c *fiber.Ctx) error {
 
 func UserLogout(c *fiber.Ctx) error {
 	config.DeleteSessionKey(c, "user")
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), nil, "User logged out"))
+	return c.JSON(config.BaseResult(config.GetStatus("OK"), "User logged out"))
 }
 
 func GetCodeRegistration(c *fiber.Ctx) error {
