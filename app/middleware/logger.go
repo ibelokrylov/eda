@@ -26,6 +26,7 @@ func LoggerMiddleware(c *fiber.Ctx, logger *logrus.Logger) error {
 			Path:     "/",
 			SameSite: "None",
 			Secure:   true,
+			HTTPOnly: true,
 		})
 		traceID = newTraceID
 	}
