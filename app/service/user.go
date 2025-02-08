@@ -10,44 +10,48 @@ import (
 
 func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	// Check if a user with the given username already exists
-	find_user, _ := GetUserByUsername(user.Username)
-	if find_user.ID != 0 {
+	fu, _ := GetUserByUsername(user.Username)
+	if fu.ID != 0 {
 		return nil, errors.New("cretae-user@user-not-created")
 	}
 
 	// Create a new user instance
-	new_user := new(entities.User)
-	new_user.Username = user.Username
-	new_user.IsActive = false
-	new_user.FirstName = user.FirstName
-	new_user.LastName = user.LastName
+	nu := new(entities.User)
+	nu.Username = user.Username
+	nu.IsActive = false
+	nu.FirstName = user.FirstName
+	nu.LastName = user.LastName
 
 	// Hash the user's password
-	hash_password, _ := helpers.HashPassword(user.Password)
-	new_user.Password = hash_password
+	hp, _ := helpers.HashPassword(user.Password)
+	nu.Password = hp
 
 	// Save the new user to the database
-	u := config.Db.Create(&new_user)
+	u := config.Db.Create(&nu)
 	if u.Error != nil {
 		return nil, u.Error
 	}
 
 	// Uncomment and implement the following lines if email confirmation is required
-	// code, err := GenerateCode(new_user.ID, entities.CODE_REGISTRATION)
+	// code, err := GenerateCode(nu.ID, entities.CODE_REGISTRATION)
 	// if err != nil {
-	// 	return new_user, err
+	// 	return nu, err
 	// }
-	// err = SendEmailCodeConfirmRegistration(new_user.Username, code.Code)
+	// err = SendEmailCodeConfirmRegistration(nu.Username, code.Code)
 	// if err != nil {
-	// 	return new_user, err
+	// 	return nu, err
 	// }
 
-	return new_user, nil
+	return nu, nil
 }
 
 func GetUserById(user_id int64) (entities.User, error) {
 	var user entities.User
-	u := config.Db.Unscoped().First(&user, "id = ?", user_id)
+	u := config.Db.Unscoped().First(
+		&user,
+		"id = ?",
+		user_id,
+	)
 	if u.Error != nil {
 		return entities.User{}, u.Error
 	}
@@ -56,35 +60,54 @@ func GetUserById(user_id int64) (entities.User, error) {
 
 func GetUserByUsername(username string) (entities.User, error) {
 	var user entities.User
-	u := config.Db.Unscoped().First(&user, "username = ?", username)
+	u := config.Db.Unscoped().First(
+		&user,
+		"username = ?",
+		username,
+	)
 	if u.Error != nil {
 		return entities.User{}, u.Error
 	}
 	return user, nil
 }
 
-func UpdateUser(user entities.User) (entities.User, error) {
-	u := config.Db.Save(&user)
-	if u.Error != nil {
-		return entities.User{}, u.Error
-	}
-	return user, nil
-}
+//func UpdateUser(user entities.User) (entities.User, error) {
+//	u := config.Db.Save(&user)
+//	if u.Error != nil {
+//		return entities.User{}, u.Error
+//	}
+//	return user, nil
+//}nil
 
-func GetUserRegistrationNewOrOldCode(user_id int64) error {
-	code, err := GetUserCodeByType(user_id, entities.CODE_REGISTRATION)
+func GetUserRegistrationNewOrOldCode(userId int64) error {
+	code, err := GetUserCodeByType(
+		userId,
+		entities.CODE_REGISTRATION,
+	)
 	if err != nil {
 		return err
 	}
-	user, _ := GetUserById(user_id)
-	SendEmailCodeConfirmRegistration(user.Username, code.Code)
+	user, _ := GetUserById(userId)
+	err = SendEmailCodeConfirmRegistration(
+		user.Username,
+		code.Code,
+	)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, error) {
 	bzu := new(entities.UserBzuNorm)
 	res := new(entities.UserBzuNormResponse)
-	if err := config.Db.Where("user_id = ?", id).Where("day = ?", date).First(bzu).Error; err != nil {
+	if err := config.Db.Where(
+		"user_id = ?",
+		id,
+	).Where(
+		"day = ?",
+		date,
+	).First(bzu).Error; err != nil {
 		if err.Error() == "record not found" {
 			// generate bzu
 			cb, err := CalculatedUserBzu(id)
@@ -93,9 +116,12 @@ func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, 
 			}
 
 			bzu = &entities.UserBzuNorm{
-				UserID: id,
-				Day:    date,
-				Max:    cb,
+				UserID:  id,
+				Day:     date,
+				Max:     cb.Max,
+				Fat:     cb.Fat,
+				Protein: cb.Protein,
+				Carb:    cb.Carb,
 			}
 			config.Db.Create(&bzu)
 		} else {
@@ -109,8 +135,26 @@ func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, 
 	res.Max = bzu.Max
 	res.Day = bzu.Day
 
+	if bzu.Fat == 0 {
+		p := bzu.Max / 100
+		bzu.Fat = p * 0.3 / 9
+		bzu.Protein = p * 0.2 / 4
+		bzu.Carb = p * 0.5 / 4
+		config.Db.Save(&bzu)
+	}
+
+	res.Fat = bzu.Fat
+	res.Protein = bzu.Protein
+	res.Carb = bzu.Carb
+
 	m := new(entities.Meal)
-	ferr := config.Db.Where("day = ?", date).Where("user_id = ?", id).First(m).Error
+	ferr := config.Db.Where(
+		"day = ?",
+		date,
+	).Where(
+		"user_id = ?",
+		id,
+	).First(m).Error
 	if ferr == nil {
 		c := 0.0
 
@@ -127,18 +171,22 @@ func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, 
 	return *res, nil
 }
 
-func CalculatedUserBzu(id int64) (float64, error) {
+func CalculatedUserBzu(id int64) (*entities.UserBzuCalculate, error) {
 	u := new(entities.User)
 
-	if err := config.Db.Preload("Survey").Where("id = ?", id).First(u).Error; err != nil {
-		return 0, err
+	if err := config.Db.Preload("Survey").Where(
+		"id = ?",
+		id,
+	).First(u).Error; err != nil {
+		return nil, err
 	}
+	r := new(entities.UserBzuCalculate)
 
 	var calc float64 = 0
 	age := CalculateUserAgeByBirthdayDate(u.Survey.Data.Birthday)
 
 	if u.Survey.Data.Gender == "" {
-		return 0, errors.New("CalculatedUserBzu@Survey-required")
+		return nil, errors.New("CalculatedUserBzu@Survey-required")
 	}
 	if u.Survey.Data.Gender == "MALE" {
 		calc = 66.5 + (13.75 * float64(u.Survey.Data.Weight)) + (5.003 * float64(u.Survey.Data.Growth)) - (6.755 * float64(age))
@@ -146,6 +194,9 @@ func CalculatedUserBzu(id int64) (float64, error) {
 		calc = 655.1 + (9.563 * float64(u.Survey.Data.Weight)) + (1.850 * float64(u.Survey.Data.Growth)) - (4.676 * float64(age))
 	}
 
+	cp := 0.227
+	cf := 0.299
+	cc := 0.474
 	switch u.Survey.Data.Activity {
 	case "SEDENTARY_LIFESTYLE":
 		calc = calc * 1.2
@@ -160,12 +211,23 @@ func CalculatedUserBzu(id int64) (float64, error) {
 	switch u.Survey.Data.Target {
 	case "LOSE_WEIGHT":
 		calc = calc - 400
+		cp = 0.301
+		cf = 0.338
+		cc = 0.359
 	case "GAIN_WEIGHT":
 		calc = calc + 400
+		cp = 0.185
+		cf = 0.293
+		cc = 0.522
 	default:
 	}
 
-	return calc, nil
+	r.Max = calc
+	r.Carb = calc * cc / 4
+	r.Fat = calc * cf / 9
+	r.Protein = calc * cp / 4
+
+	return r, nil
 }
 
 func CalculateUserAgeByBirthdayDate(bithday time.Time) int {

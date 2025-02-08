@@ -13,20 +13,48 @@ import (
 func CreateUser(c *fiber.Ctx) error {
 	user := new(entities.CreateUser)
 	if err := c.BodyParser(user); err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
 
 	if err := helpers.ValidateStruct(user); err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
 
 	new_user, err := service.CreateUser(*user)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
-	createSessionErr := config.SetSessionKey(c, "user", config.UserSession{ID: new_user.ID})
+	createSessionErr := config.SetSessionKey(
+		c,
+		"user",
+		config.UserSession{ID: new_user.ID},
+	)
 	if createSessionErr != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, createSessionErr.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				createSessionErr.Error(),
+			),
+		)
 	}
 
 	// TODO: Send email to user code
@@ -39,7 +67,12 @@ func CreateUser(c *fiber.Ctx) error {
 	// 	return c.JSON(config.BaseResult(config.GetStatus("FAIL"), err_email.Error()))
 	// }
 
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), new_user))
+	return c.JSON(
+		config.BaseResult(
+			config.GetStatus("OK"),
+			new_user,
+		),
+	)
 }
 
 type GetUserOptions struct {
@@ -58,24 +91,55 @@ func GetUserById(user_id int64) (entities.User, error) {
 func GetUserProfile(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
 	user_data, err := GetUserById(user.ID)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), user_data))
+	return c.JSON(
+		config.BaseResult(
+			config.GetStatus("OK"),
+			user_data,
+		),
+	)
 }
 
 func UserLogout(c *fiber.Ctx) error {
-	config.DeleteSessionKey(c, "user")
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), "User logged out"))
+	config.DeleteSessionKey(
+		c,
+		"user",
+	)
+	return c.JSON(
+		config.BaseResult(
+			config.GetStatus("OK"),
+			"User logged out",
+		),
+	)
 }
 
 func GetCodeRegistration(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
 	return service.GetUserRegistrationNewOrOldCode(user.ID)
 }
@@ -83,17 +147,39 @@ func GetCodeRegistration(c *fiber.Ctx) error {
 func GetUserBzu(c *fiber.Ctx) error {
 	user, err := config.ParseUserSession(c)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
 
-	date, err := time.Parse("2006-01-02", c.Query("date"))
+	date, err := time.Parse(
+		"2006-01-02",
+		c.Query("date"),
+	)
 	if err != nil {
-		// date current day 00:00:00
 		date = time.Now().Truncate(24 * time.Hour)
 	}
-	bzu, err := service.GenerateOrReadBzu(user.ID, date)
+	bzu, err := service.GenerateOrReadBzu(
+		user.ID,
+		date,
+	)
 	if err != nil {
-		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
+		return c.JSON(
+			config.BaseResult(
+				config.GetStatus("FAIL"),
+				nil,
+				err.Error(),
+			),
+		)
 	}
-	return c.JSON(config.BaseResult(config.GetStatus("OK"), bzu))
+	return c.JSON(
+		config.BaseResult(
+			config.GetStatus("OK"),
+			bzu,
+		),
+	)
 }
