@@ -80,27 +80,41 @@ func CalculateStatMeal(sm []entities.MealFood) (entities.ProductStat, []entities
 	for id, i := range m {
 		var err error
 		var name string
+		k := i.Weight / 100
 
 		if i.Type == "product" {
 			p := new(entities.Product)
 			err = config.Db.Where("id = ?", i.Id).Find(p).Error
 			name = p.Name
-			stat = &entities.ProductStat{
-				Calories: p.Calories,
-				Carbs:    p.Carbs,
-				Fat:      p.Fat,
+			stat.Calories += p.Calories * k
+			stat.Protein += p.Protein * k
+			stat.Fat += p.Fat * k
+			stat.Carbs += p.Carbs * k
+
+			m[id].Info = &entities.ProductStat{
 				Protein:  p.Protein,
+				Fat:      p.Fat,
+				Carbs:    p.Carbs,
+				Calories: p.Calories,
 			}
+
 		} else {
 			f := new(entities.Food)
 			err = config.Db.Where("id = ?", i.Id).Find(f).Error
 			name = f.Name
-			stat = &entities.ProductStat{
-				Calories: f.Calories,
-				Carbs:    f.Carbs,
-				Fat:      f.Fat,
+
+			stat.Calories += f.Calories * k
+			stat.Protein += f.Protein * k
+			stat.Fat += f.Fat * k
+			stat.Carbs += f.Carbs * k
+
+			m[id].Info = &entities.ProductStat{
 				Protein:  f.Protein,
+				Fat:      f.Fat,
+				Carbs:    f.Carbs,
+				Calories: f.Calories,
 			}
+
 		}
 
 		if err != nil {
@@ -108,24 +122,15 @@ func CalculateStatMeal(sm []entities.MealFood) (entities.ProductStat, []entities
 		}
 
 		m[id].Name = &name
-		m[id].Info = *stat
-
-		k := i.Weight / 100
-		stat.Calories += i.Info.Calories * k
-		stat.Protein += i.Info.Protein * k
-		stat.Fat += i.Info.Fat * k
-		stat.Carbs += i.Info.Carbs * k
 
 		fw += i.Weight
 	}
 
-	// Подсчет средних значений
-	prl := float64(len(m))
 	return entities.ProductStat{
-		Calories: stat.Calories / prl,
-		Protein:  stat.Protein / prl,
-		Fat:      stat.Fat / prl,
-		Carbs:    stat.Carbs / prl,
+		Calories: stat.Calories,
+		Protein:  stat.Protein,
+		Fat:      stat.Fat,
+		Carbs:    stat.Carbs,
 	}, m, fw, nil
 }
 
@@ -134,5 +139,6 @@ func GetMealByUserId(id int64, d time.Time) ([]entities.Meal, error) {
 	if err := config.Db.Where("day = ?", d).Where("user_id = ?", id).Find(&meal).Error; err != nil {
 		return nil, err
 	}
+
 	return meal, nil
 }

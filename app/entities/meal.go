@@ -20,11 +20,11 @@ type Meal struct {
 }
 
 type MealFood struct {
-	Type   string      `json:"type" validate:"required,eq=product|eq=food"`
-	Id     *int64      `json:"id"`
-	Weight float64     `json:"weight" validate:"required"`
-	Info   ProductStat `json:"info" gorm:"json"`
-	Name   *string     `json:"name"`
+	Type   string       `json:"type" validate:"required,eq=product|eq=food"`
+	Id     *int64       `json:"id"`
+	Weight float64      `json:"weight" validate:"required"`
+	Info   *ProductStat `json:"info" gorm:"json"`
+	Name   *string      `json:"name"`
 }
 type MealType string
 

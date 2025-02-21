@@ -39,7 +39,7 @@ func Connect() error {
 func UpdateTSV(db, name, lang, content string, id int64) error {
 	sql := fmt.Sprintf(`
         UPDATE %s
-        SET %s = to_tsvector('%s', ?)
+        SET %s = to_tsvector(%s, ?)
         WHERE id = ?
     `, db, name, lang)
 
