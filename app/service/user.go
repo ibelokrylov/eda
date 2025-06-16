@@ -135,37 +135,18 @@ func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, 
 	res.Max = bzu.Max
 	res.Day = bzu.Day
 
-	if bzu.Fat == 0 {
-		p := bzu.Max / 100
-		bzu.Fat = p * 0.3 / 9
-		bzu.Protein = p * 0.2 / 4
-		bzu.Carb = p * 0.5 / 4
-		config.Db.Save(&bzu)
+	m, err := GetMealByUserId(id, date)
+	if err != nil {
+		return entities.UserBzuNormResponse{}, err
 	}
 
-	res.Fat = bzu.Fat
-	res.Protein = bzu.Protein
-	res.Carb = bzu.Carb
-
-	m := new(entities.Meal)
-	ferr := config.Db.Where(
-		"day = ?",
-		date,
-	).Where(
-		"user_id = ?",
-		id,
-	).First(m).Error
-	if ferr == nil {
-		c := 0.0
-
-		if len(m.MealFoods) != 0 {
-			for _, i := range m.MealFoods {
-				cf := i.Weight / 100
-				c += i.Info.Calories * cf
-			}
+	if len(m) != 0 {
+		for _, meal := range m {
+			res.Fat += meal.Info.Fat
+			res.Protein += meal.Info.Protein
+			res.Carb += meal.Info.Carbs
+			res.Current += meal.Info.Calories
 		}
-
-		res.Current = c
 	}
 
 	return *res, nil
