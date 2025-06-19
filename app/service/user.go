@@ -71,14 +71,6 @@ func GetUserByUsername(username string) (entities.User, error) {
 	return user, nil
 }
 
-//func UpdateUser(user entities.User) (entities.User, error) {
-//	u := config.Db.Save(&user)
-//	if u.Error != nil {
-//		return entities.User{}, u.Error
-//	}
-//	return user, nil
-//}nil
-
 func GetUserRegistrationNewOrOldCode(userId int64) error {
 	code, err := GetUserCodeByType(
 		userId,
@@ -140,14 +132,17 @@ func GenerateOrReadBzu(id int64, date time.Time) (entities.UserBzuNormResponse, 
 		return entities.UserBzuNormResponse{}, err
 	}
 
+	uBzu, err := CalculatedUserBzu(id)
+
 	if len(m) != 0 {
 		for _, meal := range m {
-			res.Fat += meal.Info.Fat
-			res.Protein += meal.Info.Protein
-			res.Carb += meal.Info.Carbs
 			res.Current += meal.Info.Calories
 		}
 	}
+
+	res.Fat = uBzu.Fat
+	res.Protein = uBzu.Protein
+	res.Carb = uBzu.Carb
 
 	return *res, nil
 }
