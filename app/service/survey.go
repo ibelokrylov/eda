@@ -7,31 +7,35 @@ import (
 )
 
 func CreateSurvey(userID int64, survey entities.SurveyData) (entities.UserSurvey, error) {
-	find_survey, _ := GetSurveyByUserId(userID)
+	findSurvey, _ := GetSurveyByUserId(userID)
 
-	if find_survey.ID != 0 {
+	if findSurvey.ID != 0 {
 		if err := helpers.ValidateStruct(&survey); err != nil {
 			return entities.UserSurvey{}, err
 		}
-		find_survey.Data = survey
-		if err := config.Db.Save(&find_survey).Error; err != nil {
+		findSurvey.Data = survey
+		if err := config.Db.Save(&findSurvey).Error; err != nil {
 			return entities.UserSurvey{}, err
 		}
-		return find_survey, nil
+		return findSurvey, nil
 	}
 
-	new_survey := new(entities.UserSurvey)
+	newSurvey := new(entities.UserSurvey)
 
-	new_survey.UserID = userID
-	new_survey.Data = survey
+	newSurvey.UserID = userID
+	newSurvey.Data = survey
 
-	er := config.Db.Create(&new_survey)
+	er := config.Db.Create(&newSurvey)
 
 	if er.Error != nil {
 		return entities.UserSurvey{}, er.Error
 	}
 
-	return *new_survey, nil
+	err := RegenerateUserBzuNorm(userID)
+	if err != nil {
+		return entities.UserSurvey{}, err
+	}
+	return *newSurvey, nil
 }
 
 func GetSurveyByUserId(userID int64) (entities.UserSurvey, error) {

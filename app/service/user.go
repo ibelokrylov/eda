@@ -5,6 +5,7 @@ import (
 	"eda/app/entities"
 	"eda/app/helpers"
 	"errors"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -45,12 +46,12 @@ func CreateUser(user entities.CreateUser) (*entities.User, error) {
 	return nu, nil
 }
 
-func GetUserById(user_id int64) (entities.User, error) {
+func GetUserById(userId int64) (entities.User, error) {
 	var user entities.User
 	u := config.Db.Unscoped().First(
 		&user,
 		"id = ?",
-		user_id,
+		userId,
 	)
 	if u.Error != nil {
 		return entities.User{}, u.Error
@@ -87,6 +88,51 @@ func GetUserRegistrationNewOrOldCode(userId int64) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func RegenerateUserBzuNorm(id int64) error {
+	date := time.Now().Truncate(24 * time.Hour)
+
+	cb, err := CalculatedUserBzu(id)
+	if err != nil {
+		return err
+	}
+
+	if err := config.Db.
+		Where("user_id = ?", id).
+		Where("date = ?", date).
+		First(&entities.UserBzuNorm{}).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			bzu := &entities.UserBzuNorm{
+				UserID:  id,
+				Day:     date,
+				Max:     cb.Max,
+				Fat:     cb.Fat,
+				Protein: cb.Protein,
+				Carb:    cb.Carb,
+			}
+
+			config.Db.Create(&bzu)
+			return nil
+		}
+		return err
+	}
+
+	err = config.Db.
+		Where("user_id = ?", id).
+		Where("day = ?", date).
+		Updates(entities.UserBzuNorm{
+			Max:     cb.Max,
+			Fat:     cb.Fat,
+			Protein: cb.Protein,
+			Carb:    cb.Carb,
+		}).Error
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -13,11 +13,11 @@ func CreateSurvey(c *fiber.Ctx) error {
 	if err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
-	body_survey := new(entities.SurveyData)
-	if err := c.BodyParser(body_survey); err != nil {
+	bodySurvey := new(entities.SurveyData)
+	if err := c.BodyParser(bodySurvey); err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
-	survey, err := service.CreateSurvey(user.ID, *body_survey)
+	survey, err := service.CreateSurvey(user.ID, *bodySurvey)
 	if err != nil {
 		return c.JSON(config.BaseResult(config.GetStatus("FAIL"), nil, err.Error()))
 	}
