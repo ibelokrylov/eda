@@ -14,6 +14,13 @@ func Setup(app *fiber.App) {
 
 	v1 := api.Group("/v1")
 
+	test := v1.Group("/test")
+	test.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"success": true,
+		})
+	})
+
 	user := v1.Group("/user")
 	user.Post("/meal", middleware.IsAuthRequired, handlers.CreateMeal)
 	user.Get("/meal", middleware.IsAuthRequired, handlers.GetMealByUserId)
