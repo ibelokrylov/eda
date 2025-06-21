@@ -27,5 +27,5 @@ jobs:
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
         run: |
-          echo "Connecting to $SERVER_USER@$SERVER_HOST on port 221 using sshpass"
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -p 221 $SERVER_USER@$SERVER_HOST 'cd project/eda/ && git pull && docker-compose up -d --build --no-deps api && docker system prune -a -f'
+          echo "Connecting to $SERVER_USER@$SERVER_HOST on port 22 using sshpass"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -p 22 $SERVER_USER@$SERVER_HOST 'cd project/eda/ && git pull && docker-compose up -d --build --no-deps api && docker system prune -a -f'
