@@ -18,14 +18,14 @@ jobs:
         with:
           go-version: '^1.23'
 
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: Update repository on server
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
-
         run: |
-          echo "${SSH_PRIVATE_KEY}" > private_key.pem
-          chmod 600 private_key.pem
-          echo "Connecting to $SERVER_USER@$SERVER_HOST on port 221"
-          ssh -i private_key.pem -o StrictHostKeyChecking=no -o User=$SERVER_USER -o Port=221 $SERVER_HOST 'cd project/eda/ && git pull && docker-compose up -d --build --no-deps api && docker system prune -a -f'
+          echo "Connecting to $SERVER_USER@$SERVER_HOST on port 221 using sshpass"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -p 221 $SERVER_USER@$SERVER_HOST 'cd project/eda/ && git pull && docker-compose up -d --build --no-deps api && docker system prune -a -f'
