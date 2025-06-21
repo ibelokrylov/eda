@@ -5,6 +5,7 @@ import (
 	"eda/app/entities"
 	"eda/app/helpers"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -95,13 +96,14 @@ func RegenerateUserBzuNorm(id int64) error {
 	date := time.Now().Truncate(24 * time.Hour)
 
 	cb, err := CalculatedUserBzu(id)
+	fmt.Println(cb.Max)
 	if err != nil {
 		return err
 	}
 
 	if err := config.Db.
 		Where("user_id = ?", id).
-		Where("date = ?", date).
+		Where("day = ?", date).
 		First(&entities.UserBzuNorm{}).Error; err != nil {
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {

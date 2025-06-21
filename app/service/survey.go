@@ -17,6 +17,11 @@ func CreateSurvey(userID int64, survey entities.SurveyData) (entities.UserSurvey
 		if err := config.Db.Save(&findSurvey).Error; err != nil {
 			return entities.UserSurvey{}, err
 		}
+
+		err := RegenerateUserBzuNorm(userID)
+		if err != nil {
+			return entities.UserSurvey{}, err
+		}
 		return findSurvey, nil
 	}
 
@@ -35,6 +40,7 @@ func CreateSurvey(userID int64, survey entities.SurveyData) (entities.UserSurvey
 	if err != nil {
 		return entities.UserSurvey{}, err
 	}
+
 	return *newSurvey, nil
 }
 
