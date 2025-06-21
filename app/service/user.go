@@ -5,7 +5,6 @@ import (
 	"eda/app/entities"
 	"eda/app/helpers"
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -96,7 +95,6 @@ func RegenerateUserBzuNorm(id int64) error {
 	date := time.Now().Truncate(24 * time.Hour)
 
 	cb, err := CalculatedUserBzu(id)
-	fmt.Println(cb.Max)
 	if err != nil {
 		return err
 	}
